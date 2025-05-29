@@ -9,6 +9,9 @@ export default function HeroSection() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
             MyCitiverse
           </h1>
+          <h2 className="text-2xl md:text-2xl lg:text-3xl font-bold leading-tight" style={{color: 'yellow'}}>
+            (Coming Soon)
+          </h2>
           
           {/* Subheading */}
           <p className="text-lg md:text-xl text-blue-100 max-w-2xl">
