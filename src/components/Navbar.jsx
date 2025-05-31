@@ -24,7 +24,10 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo/Brand */}
           <div className="flex-shrink-0">
-            <span className="text-white font-bold text-xl">MyCitiverse</span>
+          <Link to="/" className="text-white font-bold text-xl transition-transform duration-300 ease-in-out
+          hover:scale-105 hover:text-blue-300">
+           MyCitiverse
+          </Link>
           </div>
 
           {/* Desktop Navigation */}
