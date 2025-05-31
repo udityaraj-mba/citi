@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Input } from "../components/ui/Input";
 import { Label } from "../components/ui/Label";
 import { Checkbox } from "../components/ui/Checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import Button from "../components/ui/Button";
+import { getUserEvents, deleteUserEvent } from '../utils/storage';
 
 // SearchBar Component
 function SearchBar({ onSearch, placeholder = "Search...", className = "" }) {
@@ -56,15 +57,18 @@ function Filters({ onChange }) {
 
 // EventCard Component
 function EventCard({
+  id,
   title = "Concert Night",
   date = "June 15, 2023",
   location = "Main Auditorium",
   description = "Join us for an unforgettable night of music.",
   imageUrl,
-  category
+  category = "Music",
+  onDelete,
+  isUserEvent = false
 }) {
   return (
-    <Card className="h-full">
+    <Card className="h-full relative">
       <div className="h-48 bg-gray-200 border-2 border-dashed rounded-t-lg">
         {imageUrl ? (
           <img 
@@ -84,6 +88,14 @@ function EventCard({
         <p className="text-gray-500 mb-4">{location}</p>
         <p className="text-gray-700 mb-6">{description}</p>
         <Button className="w-full">Book Now</Button>
+        {isUserEvent && (
+          <button
+            onClick={() => onDelete(id)}
+            className="absolute top-2 right-2 text-sm text-red-500 hover:text-red-700"
+          >
+            ✕
+          </button>
+        )}
       </CardContent>
     </Card>
   );
@@ -91,14 +103,19 @@ function EventCard({
 
 // Main EventsPage Component
 export default function EventsPage() {
-  const [events] = useState([
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [userEvents, setUserEvents] = useState([]);
+
+  const dummyEvents = [
     {
       id: '1',
       title: 'Jazz Night',
       description: 'An evening of smooth jazz with local artists',
       date: '2023-11-15',
       location: 'City Jazz Club',
-      category: 'Music'
+      category: 'Music',
+      imageUrl: ''
     },
     {
       id: '2',
@@ -106,7 +123,8 @@ export default function EventsPage() {
       description: 'Annual city marathon through downtown',
       date: '2023-11-20',
       location: 'Central Park',
-      category: 'Sports'
+      category: 'Sports',
+      imageUrl: ''
     },
     {
       id: '3',
@@ -114,7 +132,8 @@ export default function EventsPage() {
       description: 'Learn professional photography techniques',
       date: '2023-11-25',
       location: 'Arts Center',
-      category: 'Workshops'
+      category: 'Workshops',
+      imageUrl: ''
     },
     {
       id: '4',
@@ -122,7 +141,8 @@ export default function EventsPage() {
       description: 'Taste cuisine from around the world',
       date: '2023-12-02',
       location: 'Downtown Square',
-      category: 'Festivals'
+      category: 'Festivals',
+      imageUrl: ''
     },
     {
       id: '5',
@@ -130,24 +150,36 @@ export default function EventsPage() {
       description: 'Popular rock bands performing live',
       date: '2023-12-10',
       location: 'Arena Stadium',
-      category: 'Music'
+      category: 'Music',
+      imageUrl: ''
     }
-  ]);
+  ];
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  // Load user events on mount
+  useEffect(() => {
+    setUserEvents(Array.isArray(getUserEvents()) ? getUserEvents() : []);
+  }, []);
 
-  const filteredEvents = events.filter(event => {
-    const matchesSearch = 
-      event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesCategories = 
-      selectedCategories.length === 0 || 
-      selectedCategories.includes(event.category);
-    
-    return matchesSearch && matchesCategories;
-  });
+  const handleDelete = (id) => {
+    deleteUserEvent(id);
+    setUserEvents(getUserEvents());
+  };
+
+  const allEvents = [...userEvents.map(e => ({ ...e, isUserEvent: true })), ...dummyEvents];
+
+  const filteredEvents = useMemo(() => {
+    return allEvents.filter(event => {
+      const matchesSearch = 
+        event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.description.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesCategories = 
+        selectedCategories.length === 0 || 
+        selectedCategories.includes(event.category);
+      
+      return matchesSearch && matchesCategories;
+    });
+  }, [allEvents, searchQuery, selectedCategories]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -168,12 +200,16 @@ export default function EventsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filteredEvents.map(event => (
                 <EventCard
-                  key={event.id}
+                  key={event.id || `${event.title}-${event.date}`} 
+                  id={event.id}
                   title={event.title}
                   date={event.date}
                   location={event.location}
                   description={event.description}
                   category={event.category}
+                  imageUrl={event.imageUrl}
+                  isUserEvent={event.isUserEvent}
+                  onDelete={handleDelete}
                 />
               ))}
             </div>

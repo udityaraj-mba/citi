@@ -5,8 +5,9 @@ import Hero from './components/Hero';
 import Features from './components/Features';
 import CTA from './components/CTA';
 import Footer from './components/Footer';
-import Button from './components/ui/Button';
 import EventsPage from './pages/EventsPage';
+import OrganizePage from './pages/OrganizePage';
+
 function HomePage() {
   return (
     <>
@@ -16,6 +17,7 @@ function HomePage() {
     </>
   );
 }
+
 function App() {
   return (
     <Router>
@@ -23,12 +25,9 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/events" element={<EventsPage />} />
-        </Routes>
-      <Hero />
-      <Features />
-      <CTA />
+        <Route path="/organize" element={<OrganizePage />} />
+      </Routes>
       <Footer />
-      <Button>Get Started</Button>
     </Router>
   );
 }
