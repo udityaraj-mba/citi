@@ -3,24 +3,22 @@ import { Label } from "/components/ui/label";
 import { Checkbox } from "/components/ui/Checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "/components/ui/card";
 
-interface FiltersProps {
-  onChange?: (selectedFilters: string[]) => void; // Made optional with ?
-}
-
-export default function Filters({ onChange = () => {} }: FiltersProps) {
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+export default function Filters({ onChange }) {
+  const [selectedFilters, setSelectedFilters] = useState([]);
   const categories = ['Music', 'Sports', 'Workshops', 'Festivals'];
 
-  const handleCheckboxChange = (category: string) => {
-    setSelectedFilters(prev => 
+  const handleCheckboxChange = (category) => {
+    setSelectedFilters((prev) =>
       prev.includes(category)
-        ? prev.filter(item => item !== category)
+        ? prev.filter((item) => item !== category)
         : [...prev, category]
     );
   };
 
   useEffect(() => {
-    onChange(selectedFilters);
+    if (onChange) {
+      onChange(selectedFilters);
+    }
   }, [selectedFilters, onChange]);
 
   return (
@@ -29,7 +27,7 @@ export default function Filters({ onChange = () => {} }: FiltersProps) {
         <CardTitle className="text-lg">Filter Events</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {categories.map(category => (
+        {categories.map((category) => (
           <div key={category} className="flex items-center space-x-2">
             <Checkbox
               id={`filter-${category.toLowerCase()}`}
@@ -45,3 +43,8 @@ export default function Filters({ onChange = () => {} }: FiltersProps) {
     </Card>
   );
 }
+
+// Default onChange handler if not provided
+Filters.defaultProps = {
+  onChange: () => {},
+};

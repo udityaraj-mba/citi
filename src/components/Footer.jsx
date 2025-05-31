@@ -16,13 +16,16 @@ export default function Footer() {
 
           {/* Social links */}
           <div className="flex space-x-6">
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
+            <a
+            href="#!" aria-label="Facebook" className="text-gray-400 hover:text-white transition-colors">
               <Facebook className="w-6 h-6" />
             </a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
+            <a
+            href="https://twitter.com/MyCitiverse" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-gray-400 hover:text-white transition-colors">
               <Twitter className="w-6 h-6" />
             </a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
+            <a
+            href="https://www.instagram.com/mycitiverse" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-gray-400 hover:text-white transition-colors">
               <Instagram className="w-6 h-6" />
             </a>
           </div>

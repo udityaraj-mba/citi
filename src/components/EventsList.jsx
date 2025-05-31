@@ -1,14 +1,4 @@
-import Button from "../components/ui/Button"
-
-interface EventCardProps {
-  id: number;
-  title: string;
-  date: string;
-  location: string;
-  description: string;
-  imageUrl?: string;
-  onDelete?: (id: number) => void; // optional delete handler
-}
+import Button from "../components/ui/Button";
 
 function EventCard({
   id,
@@ -17,8 +7,8 @@ function EventCard({
   location = "Main Auditorium",
   description = "Join us for an unforgettable night of music featuring top artists from around the world.",
   imageUrl,
-  onDelete
-}: Partial<EventCardProps>) {
+  onDelete,
+}) {
   return (
     <div className="max-w-sm rounded-lg overflow-hidden shadow-lg bg-white h-full flex flex-col">
       {/* Event Image */}
@@ -46,10 +36,10 @@ function EventCard({
         {/* Action Buttons */}
         <div className="flex flex-col gap-2 mt-auto">
           <Button className="w-full bg-blue-600 hover:bg-blue-700">Book Now</Button>
-          {onDelete && (
+          {onDelete && id !== undefined && (
             <Button 
               className="w-full bg-red-500 hover:bg-red-600"
-              onClick={() => onDelete(id!)} // non-null assertion since we expect id when deletable
+              onClick={() => onDelete(id)}
             >
               Delete
             </Button>
@@ -57,7 +47,7 @@ function EventCard({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default EventCard;

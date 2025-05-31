@@ -3,8 +3,9 @@ import { Input } from "../components/ui/Input";
 import { Label } from "../components/ui/Label";
 import { Checkbox } from "../components/ui/Checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import Button from "../components/ui/Button";
 import { getUserEvents, deleteUserEvent } from '../utils/storage';
+import { EventCard } from '../components/EventCard';
+
 
 // SearchBar Component
 function SearchBar({ onSearch, placeholder = "Search...", className = "" }) {
@@ -55,51 +56,6 @@ function Filters({ onChange }) {
   );
 }
 
-// EventCard Component
-function EventCard({
-  id,
-  title = "Concert Night",
-  date = "June 15, 2023",
-  location = "Main Auditorium",
-  description = "Join us for an unforgettable night of music.",
-  imageUrl,
-  category = "Music",
-  onDelete,
-  isUserEvent = false
-}) {
-  return (
-    <Card className="h-full relative">
-      <div className="h-48 bg-gray-200 border-2 border-dashed rounded-t-lg">
-        {imageUrl ? (
-          <img 
-            src={imageUrl} 
-            alt={title} 
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
-            Event Image
-          </div>
-        )}
-      </div>
-      <CardContent className="p-6">
-        <h2 className="text-xl font-bold mb-2">{title}</h2>
-        <p className="text-gray-500 mb-1">{date}</p>
-        <p className="text-gray-500 mb-4">{location}</p>
-        <p className="text-gray-700 mb-6">{description}</p>
-        <Button className="w-full">Book Now</Button>
-        {isUserEvent && (
-          <button
-            onClick={() => onDelete(id)}
-            className="absolute top-2 right-2 text-sm text-red-500 hover:text-red-700"
-          >
-            ✕
-          </button>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
 
 // Main EventsPage Component
 export default function EventsPage() {
@@ -107,7 +63,7 @@ export default function EventsPage() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [userEvents, setUserEvents] = useState([]);
 
-  const dummyEvents = [
+  const dummyEvents = useMemo(() => [
     {
       id: '1',
       title: 'Jazz Night',
@@ -153,21 +109,26 @@ export default function EventsPage() {
       category: 'Music',
       imageUrl: ''
     }
-  ];
+  ], []);
 
   // Load user events on mount
   useEffect(() => {
-    setUserEvents(Array.isArray(getUserEvents()) ? getUserEvents() : []);
+    const storedEvents = Array.isArray(getUserEvents()) ? getUserEvents() : [];
+    setUserEvents(storedEvents);
   }, []);
 
   const handleDelete = (id) => {
     deleteUserEvent(id);
-    setUserEvents(getUserEvents());
+    const updatedEvents = getUserEvents();
+    setUserEvents(updatedEvents);
   };
 
-  const allEvents = [...userEvents.map(e => ({ ...e, isUserEvent: true })), ...dummyEvents];
-
   const filteredEvents = useMemo(() => {
+    const allEvents = [
+      ...userEvents.map(e => ({ ...e, isUserEvent: true })),
+      ...dummyEvents
+    ];
+
     return allEvents.filter(event => {
       const matchesSearch = 
         event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -179,7 +140,7 @@ export default function EventsPage() {
       
       return matchesSearch && matchesCategories;
     });
-  }, [allEvents, searchQuery, selectedCategories]);
+  }, [userEvents, dummyEvents, searchQuery, selectedCategories]);
 
   return (
     <div className="container mx-auto px-4 py-8">

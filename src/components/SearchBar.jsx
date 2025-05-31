@@ -1,28 +1,22 @@
-import { useState, ChangeEvent } from 'react';
-import { Input } from "/components/ui/Input";
+import { useState } from 'react';
+import { Input } from '/components/ui/Input';
 import { Search } from 'lucide-react';
-
-interface SearchBarProps {
-  placeholder?: string;
-  onSearch: (query: string) => void;
-  delay?: number;
-}
 
 export default function SearchBar({ 
   placeholder = "Search...", 
   onSearch, 
   delay = 300 
-}: SearchBarProps) {
+}) {
   const [query, setQuery] = useState('');
-  let timeoutId: NodeJS.Timeout;
+  let timeoutId;
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     const value = e.target.value;
     setQuery(value);
-    
+
     // Clear previous timeout
     clearTimeout(timeoutId);
-    
+
     // Set new timeout to trigger search after delay
     timeoutId = setTimeout(() => {
       onSearch(value);
