@@ -10,6 +10,7 @@ import OrganizePage from './pages/OrganizePage';
 import EventDetails from './pages/EventDetails';
 import CityFeedPage from './pages/CityFeedPage';
 import AddCityUpdate from './pages/AddCityUpdate';
+import LoginPage from "./pages/LoginPage";
 
 function HomePage() {
   return (
@@ -32,6 +33,8 @@ function App() {
         <Route path="/events/:eventId" element={<EventDetails />} />
         <Route path="/city-feed" element={<CityFeedPage />} />
         <Route path="/add-update" element={<AddCityUpdate />} />
+        <Route path="/login" element={<LoginPage />} />
+      
       </Routes>
       <Footer />
     </>

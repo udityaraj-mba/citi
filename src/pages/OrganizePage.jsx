@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Button from "../components/ui/Button"
 import { Input } from "../components/ui/Input"
 import Textarea from "../components/ui/Textarea"
 import { Label } from "../components/ui/Label"
-import { saveUserEvent } from "../utils/storage"
 import * as Select from '@radix-ui/react-select'
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
+import { db } from "../firebase";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
 
 export default function OrganizePage() {
   const [formData, setFormData] = useState({
@@ -17,7 +18,13 @@ export default function OrganizePage() {
     location: '',
     category: '',
     imageUrl: ''
-  })
+  });
+
+  // Redirect to login if user not found
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"))
+    if (!user) window.location.href = "/login"
+  }, [])
 
   const categories = [
     'Meeting',
@@ -26,52 +33,54 @@ export default function OrganizePage() {
     'Social',
     'Sports',
     'Other'
-  ]
+  ];
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
-    }))
-  }
+    }));
+  };
 
   const handleCategoryChange = (value) => {
     setFormData(prev => ({
       ...prev,
       category: value
-    }))
-  }
+    }));
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    // Check if category is selected
     if (!formData.category) {
-      alert("Please select a category.")
-      return
+      alert("Please select a category.");
+      return;
     }
 
-    // Save event to localStorage with unique ID
-    const newEvent = {
-      id: Date.now().toString(),
-      ...formData
+    try {
+      await addDoc(collection(db, "events"), {
+        ...formData,
+        createdAt: Timestamp.now()
+      });
+
+      alert("Event saved successfully!");
+
+      // Reset form
+      setFormData({
+        title: '',
+        description: '',
+        date: '',
+        time: '',
+        location: '',
+        category: '',
+        imageUrl: ''
+      });
+    } catch (error) {
+      console.error("Error adding event to Firestore:", error);
+      alert("Failed to save event. Try again.");
     }
-    saveUserEvent(newEvent)
-
-    alert("Event saved successfully!")
-
-    // Reset form
-    setFormData({
-      title: '',
-      description: '',
-      date: '',
-      time: '',
-      location: '',
-      category: '',
-      imageUrl: ''
-    })
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -145,55 +154,54 @@ export default function OrganizePage() {
             </div>
 
             <div className="space-y-2">
-  <Label htmlFor="category">Category</Label>
-  <Select.Root
-    value={formData.category}
-    onValueChange={handleCategoryChange}
-  >
-    <Select.Trigger
-      id="category"
-      aria-label="Category"
-      className="inline-flex items-center justify-between w-full px-3 py-2 border rounded-md bg-white text-sm"
-    >
-      <Select.Value placeholder="Select a category" />
-      <Select.Icon>
-        <ChevronDownIcon />
-      </Select.Icon>
-    </Select.Trigger>
+              <Label htmlFor="category">Category</Label>
+              <Select.Root
+                value={formData.category}
+                onValueChange={handleCategoryChange}
+              >
+                <Select.Trigger
+                  id="category"
+                  aria-label="Category"
+                  className="inline-flex items-center justify-between w-full px-3 py-2 border rounded-md bg-white text-sm"
+                >
+                  <Select.Value placeholder="Select a category" />
+                  <Select.Icon>
+                    <ChevronDownIcon />
+                  </Select.Icon>
+                </Select.Trigger>
 
-    <Select.Portal>
-      <Select.Content
-        className="overflow-hidden bg-white rounded-md border shadow-md"
-        position="popper"
-        sideOffset={5}
-      >
-        <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-gray-100 cursor-default">
-          <ChevronUpIcon />
-        </Select.ScrollUpButton>
+                <Select.Portal>
+                  <Select.Content
+                    className="overflow-hidden bg-white rounded-md border shadow-md"
+                    position="popper"
+                    sideOffset={5}
+                  >
+                    <Select.ScrollUpButton className="flex items-center justify-center h-6 bg-gray-100 cursor-default">
+                      <ChevronUpIcon />
+                    </Select.ScrollUpButton>
 
-        <Select.Viewport className="p-2">
-          {categories.map((category) => (
-            <Select.Item
-              key={category}
-              value={category}
-              className="relative flex items-center px-8 py-2 text-sm text-gray-700 cursor-pointer select-none hover:bg-gray-100 focus:bg-gray-100"
-            >
-              <Select.ItemText>{category}</Select.ItemText>
-              <Select.ItemIndicator className="absolute left-2 inline-flex items-center">
-                <CheckIcon />
-              </Select.ItemIndicator>
-            </Select.Item>
-          ))}
-        </Select.Viewport>
+                    <Select.Viewport className="p-2">
+                      {categories.map((category) => (
+                        <Select.Item
+                          key={category}
+                          value={category}
+                          className="relative flex items-center px-8 py-2 text-sm text-gray-700 cursor-pointer select-none hover:bg-gray-100 focus:bg-gray-100"
+                        >
+                          <Select.ItemText>{category}</Select.ItemText>
+                          <Select.ItemIndicator className="absolute left-2 inline-flex items-center">
+                            <CheckIcon />
+                          </Select.ItemIndicator>
+                        </Select.Item>
+                      ))}
+                    </Select.Viewport>
 
-        <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-gray-100 cursor-default">
-          <ChevronDownIcon />
-        </Select.ScrollDownButton>
-      </Select.Content>
-    </Select.Portal>
-  </Select.Root>
-</div>
-
+                    <Select.ScrollDownButton className="flex items-center justify-center h-6 bg-gray-100 cursor-default">
+                      <ChevronDownIcon />
+                    </Select.ScrollDownButton>
+                  </Select.Content>
+                </Select.Portal>
+              </Select.Root>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="imageUrl">Image URL (Optional)</Label>
@@ -216,5 +224,5 @@ export default function OrganizePage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

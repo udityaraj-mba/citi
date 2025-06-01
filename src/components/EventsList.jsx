@@ -1,53 +1,45 @@
-import Button from "../components/ui/Button";
+// src/pages/EventList.jsx
+import React, { useEffect, useState } from "react";
+import EventCard from "../components/EventCard";
+import { db } from "../firebase";
+import { collection, getDocs } from "firebase/firestore";
 
-function EventCard({
-  id,
-  title = "Concert Night",
-  date = "June 15, 2023",
-  location = "Main Auditorium",
-  description = "Join us for an unforgettable night of music featuring top artists from around the world.",
-  imageUrl,
-  onDelete,
-}) {
+const EventList = () => {
+  const [events, setEvents] = useState([]);
+
+  const fetchEvents = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "events"));
+      const eventsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setEvents(eventsData);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
   return (
-    <div className="max-w-sm rounded-lg overflow-hidden shadow-lg bg-white h-full flex flex-col">
-      {/* Event Image */}
-      <div className="h-48 bg-gray-200 border-2 border-dashed rounded-t-lg">
-        {imageUrl ? (
-          <img 
-            src={imageUrl} 
-            alt={title} 
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
-            Event Image
-          </div>
-        )}
-      </div>
-
-      {/* Event Content */}
-      <div className="p-6 flex-grow flex flex-col">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">{title}</h2>
-        <p className="text-gray-500 mb-1"><span className="font-medium">Date:</span> {date}</p>
-        <p className="text-gray-500 mb-4"><span className="font-medium">Location:</span> {location}</p>
-        <p className="text-gray-700 mb-6 flex-grow">{description}</p>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-2 mt-auto">
-          <Button className="w-full bg-blue-600 hover:bg-blue-700">Book Now</Button>
-          {onDelete && id !== undefined && (
-            <Button 
-              className="w-full bg-red-500 hover:bg-red-600"
-              onClick={() => onDelete(id)}
-            >
-              Delete
-            </Button>
-          )}
-        </div>
-      </div>
+    <div className="p-6 grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      {events.map((event) => (
+        <EventCard
+          key={event.id}
+          id={event.id}
+          title={event.title}
+          date={event.date}
+          location={event.location}
+          description={event.description}
+          imageUrl={event.imageUrl}
+          onDelete={null} // add delete handler if needed
+        />
+      ))}
     </div>
   );
-}
+};
 
-export default EventCard;
+export default EventList;
