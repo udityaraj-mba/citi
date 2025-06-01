@@ -13,6 +13,10 @@ export default function Navbar() {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -46,9 +50,9 @@ export default function Navbar() {
           <div className="flex-shrink-0">
             <Link
               to="/"
-              className="text-white font-bold text-xl transition-transform duration-300 ease-in-out hover:scale-105 hover:text-blue-300"
-            >
-              MyCitiverse
+              className="flex items-center space-x-2">
+              <img src="/mylogo.png" alt="MyCitiverse Logo" className="h-10 w-auto" />
+              <span className="text-white font-bold text-xl hidden sm:inline">MyCitiverse</span>
             </Link>
           </div>
 
@@ -102,6 +106,7 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   to={link.href}
+                  onClick={closeMenu}
                   className="block text-white hover:bg-blue-700 px-3 py-2 rounded-md text-base font-medium"
                 >
                   {link.name}
@@ -110,7 +115,10 @@ export default function Navbar() {
 
               {user ? (
                 <button
-                  onClick={handleLogout}
+                  onClick={() => {
+                    closeMenu();
+                    handleLogout();
+                  }}
                   className="w-full text-left text-white hover:bg-red-700 px-3 py-2 rounded-md text-base font-medium"
                 >
                   Logout
@@ -118,6 +126,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   to="/login"
+                  onClick={closeMenu}
                   className="block text-white hover:bg-blue-700 px-3 py-2 rounded-md text-base font-medium"
                 >
                   Login
