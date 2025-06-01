@@ -8,6 +8,8 @@ import Footer from './components/Footer';
 import EventsPage from './pages/EventsPage';
 import OrganizePage from './pages/OrganizePage';
 import EventDetails from './pages/EventDetails';
+import CityFeedPage from './pages/CityFeedPage';
+import AddCityUpdate from './pages/AddCityUpdate';
 
 function HomePage() {
   return (
@@ -28,6 +30,8 @@ function App() {
         <Route path="/events" element={<EventsPage />} />
         <Route path="/organize" element={<OrganizePage />} />
         <Route path="/events/:eventId" element={<EventDetails />} />
+        <Route path="/city-feed" element={<CityFeedPage />} />
+        <Route path="/add-update" element={<AddCityUpdate />} />
       </Routes>
       <Footer />
     </>

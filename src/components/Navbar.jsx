@@ -14,7 +14,9 @@ export default function Navbar() {
     { name: 'Home', href: '/' },
     { name: 'Events', href: '/events' },
     { name: 'Organize', href: '/organize' },
-    { name: 'Login', href: '/login' }
+    { name: 'Login', href: '/login' },
+    { name: 'City Feed', href: '/city-feed' },
+    { name: 'Add City Update', href: '/add-update' }
   ]
 
   return (
